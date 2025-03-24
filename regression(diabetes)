@@ -1,0 +1,206 @@
+1. 라이브러리 불러오기
+
+import pandas as pd
+import numpy as np
+import seaborn as sns
+import matplotlib.pyplot as plt
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import LabelEncoder
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.tree import DecisionTreeClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.neighbors import KNeighborsClassifier
+from sklearn.svm import SVC
+from sklearn.metrics import accuracy_score, confusion_matrix
+📌 설명:
+
+pandas, numpy: 데이터 처리 및 수학 연산
+
+seaborn, matplotlib.pyplot: 데이터 시각화
+
+sklearn.model_selection: 데이터셋 분할(train/test)
+
+sklearn.preprocessing: 데이터 전처리(Label Encoding)
+
+sklearn.ensemble, sklearn.tree, sklearn.linear_model, sklearn.svm: 머신러닝 모델들
+
+sklearn.metrics: 성능 평가
+==================================================================
+2. 데이터 불러오기
+
+df = pd.read_csv("C:/Users/min22/Desktop/Artifical intelligence/diabetes.csv", index_col=0)
+df
+📌 설명:
+
+diabetes.csv 데이터를 불러오고, 첫 번째 열(index)은 사용하지 않음.
+
+데이터셋 확인을 위해 df 출력.
+===============================================================
+3. 데이터 준비
+
+X = df.drop("Outcome", axis=1)
+X.head()
+
+y = df["Outcome"]
+y.head()
+📌 설명:
+
+X: 독립 변수(특징 데이터, Outcome을 제외한 나머지).
+
+y: 종속 변수(예측 대상인 당뇨병 여부).
+
+.head(): 데이터 일부 출력.
+==================================================================
+4. 데이터 분할
+
+X_train, X_test, y_train, y_test=train_test_split(X, y, test_size=0.2, shuffle=True, random_state=12)
+print(X_train.shape, y_train.shape)
+print(X_test.shape, y_test.shape)
+📌 설명:
+
+train_test_split(): 데이터셋을 80% (훈련) / 20% (테스트) 비율로 분할.
+
+shuffle=True: 데이터를 섞어서 나눔.
+
+random_state=12: 랜덤 시드 고정(재현성 보장).
+
+shape: 데이터 크기 출력.
+===============================================================
+5. 선형 회귀 (Linear Regression)
+
+from sklearn.linear_model import LinearRegression
+from sklearn.metrics import mean_squared_error
+
+model = LinearRegression()
+model.fit(X_train, y_train)
+ly_preds = model.predict(X_test)
+
+print('평균제곱근오차', mean_squared_error(ly_preds, y_test))
+📌 설명:
+
+LinearRegression(): 선형 회귀 모델 생성.
+
+model.fit(X_train, y_train): 모델 훈련.
+
+ly_preds = model.predict(X_test): 테스트 데이터 예측.
+
+mean_squared_error(): 평균제곱오차(MSE) 출력.
+=========================================================
+6. MSE 직접 계산
+
+def mse_np(actual, predicted):
+    return np.mean((np.array(actual) - np.array(predicted)) ** 2)
+
+print('평균제곱근오차', mse_np(ly_preds, y_test))
+
+def mse(actual, predicted):
+    sum_square_error = sum((a - p) ** 2 for a, p in zip(actual, predicted))
+    mean_square_error = sum_square_error / len(actual)
+    return mean_square_error
+
+print('평균제곱근오차', mse(ly_preds, y_test))
+📌 설명:
+
+mse_np(actual, predicted): numpy를 이용해 MSE 계산.
+
+mse(actual, predicted): for문을 이용해 MSE 계산.
+
+두 방식 모두 같은
+=========================================================
+7. BMI 기준 예측 시각화
+
+plt.figure(figsize=(10,5))
+plt.scatter(X_test['BMI'], y_test, label='y_test')
+plt.scatter(X_test['BMI'], ly_preds, c='y', label='ly_preds') # 노란색 예측값
+plt.show()
+📌 설명:
+
+X_test['BMI']: BMI 값을 기준으로 예측값과 실제값 비교.
+
+plt.scatter(): 산점도 그래프.
+
+y_test: 실제 값, ly_preds: 선형 회귀 예측값.
+
+노란색 점(c='y'): 예측값.
+======================================================
+8. 결정 트리 회귀 (Decision Tree Regressor)
+
+from sklearn.tree import DecisionTreeRegressor
+
+model = DecisionTreeRegressor()
+model.fit(X_train, y_train)
+
+dy_preds = model.predict(X_test)
+print('평균제곱근오차', mean_squared_error(dy_preds, y_test))
+📌 설명:
+
+DecisionTreeRegressor(): 결정 트리 기반 회귀 모델 사용.
+
+dy_preds: 결정 트리 예측값.
+
+MSE 출력.
+
+plt.figure(figsize=(10,5))
+plt.scatter(X_test['BMI'], y_test, label='y_test')
+plt.scatter(X_test['BMI'], dy_preds, c='g', label='dy_preds') # 초록색 예측값
+plt.show()
+📌 설명:
+
+BMI 기준 예측값(초록색) 시각화.
+=================================================================
+9. 랜덤 포레스트 회귀 (Random Forest Regressor)
+
+from sklearn.ensemble import RandomForestRegressor
+
+model = RandomForestRegressor()
+model.fit(X_train, y_train)
+
+ry_preds = model.predict(X_test)
+print('평균제곱근오차', mean_squared_error(ry_preds, y_test))
+📌 설명:
+
+RandomForestRegressor(): 랜덤 포레스트 기반 회귀 모델 사용.
+
+ry_preds: 랜덤 포레스트 예측값.
+
+MSE 출력.
+
+plt.figure(figsize=(10,5))
+plt.scatter(X_test['BMI'], y_test, label='y_test')
+plt.scatter(X_test['BMI'], ry_preds, c='orange', label='ry_preds') # 주황색 예측값
+plt.show()
+📌 설명:
+
+BMI 기준 랜덤 포레스트 예측값(주황색) 시각화.
+==================================================================
+10. 서포트 벡터 머신 회귀 (SVR)
+
+from sklearn.svm import SVR
+
+model = SVR(kernel='linear')
+model.fit(X_train, y_train)
+
+ry_preds = model.predict(X_test)
+print('평균제곱근오차', mean_squared_error(ry_preds, y_test))
+📌 설명:
+
+SVR(kernel='linear'): 선형 커널 기반 서포트 벡터 머신 회귀 모델 사용.
+
+ry_preds: SVM 예측값.
+
+MSE 출력.
+
+plt.figure(figsize=(10,5))
+plt.scatter(X_test['BMI'], y_test, label='y_test')
+plt.scatter(X_test['BMI'], ry_preds, c='orange', label='ry_preds') # 주황색 예측값
+plt.show()
+📌 설명:
+
+BMI 기준 SVM 예측값(주황색) 시각화.
+================================================================
+🧐 코드 요약
+✅ 다양한 회귀 모델(Linear Regression, Decision Tree, Random Forest, SVR) 사용
+✅ MSE(평균제곱오차)로 성능 비교
+✅ BMI 기준 실제값과 예측값 시각화
+
+각 모델의 MSE를 비교해 가장 좋은 회귀 모델을 선택할 수 있음!
